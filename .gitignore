@@ -1,5 +1,6 @@
 # Logs
 *.log
+.ci/conformance/_*
 
 # Release and work directories
 __release*

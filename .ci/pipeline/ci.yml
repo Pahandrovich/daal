@@ -46,7 +46,24 @@ jobs:
       targetPath: '$(release.dir)'
   - script: |
       .ci/scripts/test.sh --test-kind examples --build-dir $(release.dir) --platform $(platform.type)
-    displayName: 'examples'  
+    displayName: 'examples'
+  # start conformance
+  - script: conda create -q -y -n Conf python=3.7 conda-build conda-verify pytest
+    displayName: Create Anaconda environment
+  - script: |
+      export DAALROOT=$(release.dir)/daal/latest
+    # export DAALROOT=/opt/intel/inteloneapi/daal/latest
+      . /usr/share/miniconda/etc/profile.d/conda.sh
+      conda activate Conf
+      conda build --override-channels -c conda-forge -c intel conda-recipe
+    displayName: 'building daal4py'
+  - script: |
+      conda install -c intel scikit-learn
+      conda install -c anaconda pytest
+    displayName: 'create enviroment'
+  - script: |
+      python .ci/conformance/run_tests.py
+    displayName: 'run conformance'
 - job: macOS
   timeoutInMinutes: 0
   variables:
