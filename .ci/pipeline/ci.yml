@@ -48,19 +48,24 @@ jobs:
       .ci/scripts/test.sh --test-kind examples --build-dir $(release.dir) --platform $(platform.type)
     displayName: 'examples'
   # start conformance
-  - script: conda create -q -y -n Conf python=3.7 conda-build conda-verify pytest
-    displayName: Create Anaconda environment
   - script: |
-      export DAALROOT=$(release.dir)/daal/latest
-    # export DAALROOT=/opt/intel/inteloneapi/daal/latest
-      . /usr/share/miniconda/etc/profile.d/conda.sh
-      conda activate Conf
-      conda build --override-channels -c conda-forge -c intel conda-recipe
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+      bash miniconda.sh -b -p $HOME/miniconda
+      export PATH="$HOME/miniconda/bin:$PATH"
+      source activate base
+      conda create -y -n conformance
+      conda activate conformance
+      conda install -y -c conda-forge mpich tbb-devel cython jinja2 numpy clang-tools
+      export TBBROOT=$CONDA_PREFIX
+      export MPIROOT=$CONDA_PREFIX
+      source $(release.dir)/daal/latest/env/vars.sh intel64
+    displayName: 'Create Anaconda environment'
+  - script: python setup.py develop
     displayName: 'building daal4py'
   - script: |
       conda install -c intel scikit-learn
-      conda install -c anaconda pytest
-    displayName: 'create enviroment'
+      conda install -c conda-forge pytest
+    displayName: 'install scikit-learn'
   - script: |
       python .ci/conformance/run_tests.py
     displayName: 'run conformance'
