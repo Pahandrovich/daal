@@ -92,8 +92,15 @@ void DistributedPartialResultStep2::set(DistributedPartialResultStep2Id id, cons
 
 Status DistributedPartialResultStep2::check(const daal::algorithms::Input * input, const daal::algorithms::Parameter * parameter, int method) const
 {
+    printf("step2: start result check\n");
     const DistributedInput<step2Local> * algInput = static_cast<const DistributedInput<step2Local> *>(input);
     const size_t nFeatures                        = NumericTable::cast((*algInput->get(partialData))[0])->getNumberOfColumns();
+
+    //if (NumericTable::cast((*algInput->get(partialData))[0])->getNumberOfRows() == 0)
+    //{
+    //    printf("step2: end result check0\n");
+    //    return Status();
+    //}
 
     NumericTablePtr ntBoundingBox = get(boundingBox);
     DAAL_CHECK_EX(ntBoundingBox, ErrorNullNumericTable, ArgumentName, boundingBoxStr());
@@ -101,6 +108,7 @@ Status DistributedPartialResultStep2::check(const daal::algorithms::Input * inpu
     const int unexpectedLayouts = (int)packed_mask;
     DAAL_CHECK_STATUS_VAR(checkNumericTable(ntBoundingBox.get(), boundingBoxStr(), unexpectedLayouts, 0, nFeatures, 2));
 
+    printf("step2: end result check\n");
     return Status();
 }
 
@@ -248,6 +256,7 @@ void DistributedPartialResultStep6::set(DistributedPartialResultStep6CollectionI
 
 Status DistributedPartialResultStep6::check(const daal::algorithms::Input * input, const daal::algorithms::Parameter * parameter, int method) const
 {
+    printf("step6: start result check\n");
     const Parameter * par = static_cast<const Parameter *>(parameter);
 
     const size_t nBlocks = par->nBlocks;
@@ -298,7 +307,7 @@ Status DistributedPartialResultStep6::check(const daal::algorithms::Input * inpu
         const int unexpectedLayouts = (int)packed_mask;
         DAAL_CHECK_STATUS_VAR(checkNumericTable(ntQueries.get(), step6QueriesStr(), unexpectedLayouts, 0, 3, 0, false));
     }
-
+    printf("step6: end result check\n");
     return Status();
 }
 

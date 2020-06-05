@@ -62,11 +62,14 @@ template <typename algorithmFPType>
 DAAL_EXPORT services::Status DistributedPartialResultStep2::allocate(const daal::algorithms::Input * input,
                                                                      const daal::algorithms::Parameter * parameter, const int method)
 {
+    printf("step2: allocate start\n");
     const DistributedInput<step2Local> * algInput = static_cast<const DistributedInput<step2Local> *>(input);
     const size_t nFeatures                        = NumericTable::cast((*algInput->get(partialData))[0])->getNumberOfColumns();
 
     services::Status status;
+
     set(boundingBox, HomogenNumericTable<algorithmFPType>::create(nFeatures, 2, NumericTable::doAllocate, &status));
+    printf("step2: allocate end\n");
     return status;
 }
 
@@ -163,6 +166,7 @@ template <typename algorithmFPType>
 DAAL_EXPORT services::Status DistributedPartialResultStep6::allocate(const daal::algorithms::Input * input,
                                                                      const daal::algorithms::Parameter * parameter, const int method)
 {
+    printf("step6: allocate start\n");
     const Parameter * par = static_cast<const Parameter *>(parameter);
     const size_t nBlocks  = par->nBlocks;
 
@@ -170,29 +174,31 @@ DAAL_EXPORT services::Status DistributedPartialResultStep6::allocate(const daal:
 
     DataCollectionPtr dcPartialData = algInput->get(partialData);
     size_t nDataBlocks              = dcPartialData->size();
-
+    printf("step6: debug 1\n");
     size_t nRows = 0;
     for (size_t i = 0; i < nDataBlocks; i++)
-    {
+    {   
+        printf("step6: debug 2 - %zu\n",i);
         nRows += NumericTable::cast((*algInput->get(partialData))[i])->getNumberOfRows();
     }
 
     services::Status status;
-
+    printf("step6: debug 3\n");
     set(step6ClusterStructure, HomogenNumericTable<int>::create(4, nRows, NumericTable::doAllocate, &status));
     set(step6FinishedFlag, HomogenNumericTable<int>::create(1, 1, NumericTable::doAllocate, &status));
     set(step6NClusters, HomogenNumericTable<int>::create(1, 1, NumericTable::doAllocate, &status));
-
+    printf("step6: debug 4\n");
     DataCollectionPtr dcQueries(new DataCollection(nBlocks));
     DAAL_CHECK_MALLOC(dcQueries.get());
-
+    printf("step6: debug 5\n");
     for (size_t i = 0; i < nBlocks; i++)
     {
+        printf("step6: debug 6 - %zu\n",i);
         (*dcQueries)[i] = HomogenNumericTable<int>::create(3, 0, NumericTable::notAllocate, &status);
     }
-
+    printf("step6: debug 7\n");
     set(step6Queries, dcQueries);
-
+    printf("step6: allocate end\n");
     return status;
 }
 

@@ -77,7 +77,14 @@ template <typename algorithmFPType, Method method, CpuType cpu>
 Status DBSCANDistrStep2Kernel<algorithmFPType, method, cpu>::compute(const DataCollection * dcPartialData, NumericTable * ntBoundingBox,
                                                                      const Parameter * par)
 {
+    printf("step2: start implementation\n");
     const size_t nFeatures = NumericTable::cast((*dcPartialData)[0])->getNumberOfColumns();
+
+    //if ( NumericTable::cast((*dcPartialData)[0])->getNumberOfRows() == 0) 
+    //{
+    //    printf("step2: end implementation0\n");
+    //    return Status();
+    //}
 
     WriteRows<algorithmFPType, cpu> boundingBoxRows(ntBoundingBox, 0, 2);
     DAAL_CHECK_BLOCK_STATUS(boundingBoxRows);
@@ -117,7 +124,7 @@ Status DBSCANDistrStep2Kernel<algorithmFPType, method, cpu>::compute(const DataC
             }
         }
     }
-
+    printf("step2: end implementation\n");
     return Status();
 }
 

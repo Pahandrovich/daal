@@ -123,11 +123,17 @@ void DistributedInput<step2Local>::add(LocalCollectionInputId id, const NumericT
  */
 services::Status DistributedInput<step2Local>::check(const daal::algorithms::Parameter * parameter, int method) const
 {
+    printf("step2: check start\n");
     DataCollectionPtr dcPartialData = get(partialData);
     DAAL_CHECK_EX(dcPartialData, ErrorNullInputDataCollection, ArgumentName, partialDataStr());
 
     const size_t nBlocks = dcPartialData->size();
     DAAL_CHECK_EX(nBlocks > 0, ErrorIncorrectNumberOfInputNumericTables, ArgumentName, partialDataStr());
+    if ( NumericTable::cast((*dcPartialData)[0])->getNumberOfRows() == 0) 
+    {
+        printf("step2: check end0\n");
+        return services::Status();
+    }
 
     size_t nFeatures = 0;
     for (size_t i = 0; i < nBlocks; i++)
@@ -143,7 +149,7 @@ services::Status DistributedInput<step2Local>::check(const daal::algorithms::Par
 
         DAAL_CHECK_STATUS_VAR(checkNumericTable(ntPartialData.get(), partialDataStr(), 0, 0, nFeatures, 0));
     }
-
+    printf("step2: check end\n");
     return services::Status();
 }
 
@@ -523,8 +529,10 @@ services::Status DistributedInput<step5Local>::check(const daal::algorithms::Par
     DataCollectionPtr dcPartialData = get(partialData);
     DAAL_CHECK_EX(dcPartialData, ErrorNullInputDataCollection, ArgumentName, partialDataStr());
 
-    const size_t nDataBlocks = dcPartialData->size();
+    size_t nDataBlocks = dcPartialData->size();
     DAAL_CHECK_EX(nDataBlocks > 0, ErrorIncorrectNumberOfInputNumericTables, ArgumentName, partialDataStr());
+    if (NumericTable::cast((*dcPartialData)[0])->getNumberOfRows() == 0)
+        nDataBlocks = 0;
 
     size_t nFeatures = 0;
     for (size_t i = 0; i < nDataBlocks; i++)
@@ -647,6 +655,7 @@ void DistributedInput<step6Local>::add(Step6LocalCollectionInputId id, const Num
  */
 services::Status DistributedInput<step6Local>::check(const daal::algorithms::Parameter * parameter, int method) const
 {
+    printf("step6: check start\n");
     const Parameter * par = static_cast<const Parameter *>(parameter);
 
     DAAL_CHECK_STATUS_VAR(par->check());
@@ -659,7 +668,8 @@ services::Status DistributedInput<step6Local>::check(const daal::algorithms::Par
     const size_t nDataBlocks = dcPartialData->size();
     DAAL_CHECK_EX(nDataBlocks > 0, ErrorIncorrectNumberOfInputNumericTables, ArgumentName, partialDataStr());
 
-    size_t nFeatures = 0;
+    size_t nFeatures = NumericTable::cast((*dcPartialData)[0])->getNumberOfColumns();
+    if (NumericTable::cast((*dcPartialData)[0])->getNumberOfRows() != 0) {
     for (size_t i = 0; i < nDataBlocks; i++)
     {
         DAAL_CHECK_EX((*dcPartialData)[i], ErrorNullNumericTable, ArgumentName, partialDataStr());
@@ -672,6 +682,7 @@ services::Status DistributedInput<step6Local>::check(const daal::algorithms::Par
         }
 
         DAAL_CHECK_STATUS_VAR(checkNumericTable(ntPartialData.get(), partialDataStr(), 0, 0, nFeatures, 0));
+    }
     }
 
     DataCollectionPtr dcHaloData        = get(haloData);
@@ -704,7 +715,7 @@ services::Status DistributedInput<step6Local>::check(const daal::algorithms::Par
         DAAL_CHECK_EX(ntHaloBlock, ErrorIncorrectElementInNumericTableCollection, ArgumentName, haloBlocksStr());
         DAAL_CHECK_STATUS_VAR(checkNumericTable(ntHaloBlock.get(), haloBlocksStr(), unexpectedLayouts, 0, 1, 1));
     }
-
+    printf("step6: check end\n");
     return services::Status();
 }
 
