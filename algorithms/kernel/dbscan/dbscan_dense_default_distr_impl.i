@@ -704,6 +704,7 @@ Status DBSCANDistrStep6Kernel<algorithmFPType, method, cpu>::computeNoMemSave(co
                                                                               NumericTable * ntFinishedFlag, NumericTable * ntNClusters,
                                                                               DataCollection * dcQueries, const Parameter * par)
 {
+    printf("step6: computeMemSave start\n");
     NumericTablePtr ntWeights;     // currently unsupported
     NumericTablePtr ntHaloWeights; // currently unsupported
 
@@ -786,15 +787,22 @@ Status DBSCANDistrStep6Kernel<algorithmFPType, method, cpu>::computeNoMemSave(co
     NeighborhoodEngine<method, algorithmFPType, cpu> nHaloEngine(ntData.get(), ntHaloData.get(), ntHaloWeights.get(), epsilon, minkowskiPower);
     DAAL_CHECK_STATUS_VAR(nHaloEngine.queryFull(haloNeighs.get()));
 
-    DAAL_CHECK_STATUS_VAR(ntClusterStructure->resize(nRows));
-
+    printf("step6: computeMemSave debug 1\n");
+    if (nRows)
+    {
+        DAAL_CHECK_STATUS_VAR(ntClusterStructure->resize(nRows))
+    }
+    printf("step6: computeMemSave debug 2\n");
     WriteRows<int, cpu> clusterStructureRows(ntClusterStructure, 0, nRows);
+
     if (nRows)
     {
         DAAL_CHECK_BLOCK_STATUS(clusterStructureRows);
     }
+    printf("step6: computeMemSave debug 3\n");
     int * const clusterStructure = clusterStructureRows.get();
-
+    
+    printf("step6: computeMemSave debug 4\n");
     for (size_t i = 0; i < nRows; i++)
     {
         clusterStructure[i * 4 + 0] = undefined;  // current assignment of observation
@@ -876,7 +884,7 @@ Status DBSCANDistrStep6Kernel<algorithmFPType, method, cpu>::computeNoMemSave(co
         int * const finishedFlag = finishedFlagRows.get();
         finishedFlag[0]          = int(totalFinishedFlag);
     }
-
+    printf("step6: computeMemSave end\n");
     return Status();
 }
 
@@ -887,6 +895,7 @@ Status DBSCANDistrStep6Kernel<algorithmFPType, method, cpu>::computeMemSave(cons
                                                                             NumericTable * ntFinishedFlag, NumericTable * ntNClusters,
                                                                             DataCollection * dcQueries, const Parameter * par)
 {
+    printf("step6: computeNoMemSave start\n");
     NumericTablePtr ntWeights;     // currently unsupported
     NumericTablePtr ntHaloWeights; // currently unsupported
 
@@ -959,15 +968,20 @@ Status DBSCANDistrStep6Kernel<algorithmFPType, method, cpu>::computeMemSave(cons
     NeighborhoodEngine<method, algorithmFPType, cpu> nEngine(ntData.get(), ntData.get(), ntWeights.get(), epsilon, minkowskiPower);
     NeighborhoodEngine<method, algorithmFPType, cpu> nHaloEngine(ntData.get(), ntHaloData.get(), ntHaloWeights.get(), epsilon, minkowskiPower);
 
-    DAAL_CHECK_STATUS_VAR(ntClusterStructure->resize(nRows));
-
+    printf("step6: computeNoMemSave debug 1\n");
+    if (nRows)
+    {
+        DAAL_CHECK_STATUS_VAR(ntClusterStructure->resize(nRows))
+    }
+    printf("step6: computeNoMemSave debug 2\n");
     WriteRows<int, cpu> clusterStructureRows(ntClusterStructure, 0, nRows);
     if (nRows)
     {
         DAAL_CHECK_BLOCK_STATUS(clusterStructureRows);
     }
+    printf("step6: computeNoMemSave debug 3\n");
     int * const clusterStructure = clusterStructureRows.get();
-
+    printf("step6: computeNoMemSave debug 4\n");
     for (size_t i = 0; i < nRows; i++)
     {
         clusterStructure[i * 4 + 0] = undefined;  // current assignment of observation
@@ -1071,7 +1085,7 @@ Status DBSCANDistrStep6Kernel<algorithmFPType, method, cpu>::computeMemSave(cons
         int * const finishedFlag = finishedFlagRows.get();
         finishedFlag[0]          = int(totalFinishedFlag);
     }
-
+    printf("step6: computeNoMemSave end\n");
     return Status();
 }
 
@@ -1539,6 +1553,7 @@ Status DBSCANDistrStep10Kernel<algorithmFPType, method, cpu>::compute(const Nume
                                                                       NumericTable * ntFinishedFlag, DataCollection * dcQueries,
                                                                       const Parameter * par)
 {
+    printf("step10: compute start\n");
     const size_t blockIndex = par->blockIndex;
     const size_t nBlocks    = par->nBlocks;
 
@@ -1628,6 +1643,7 @@ Status DBSCANDistrStep10Kernel<algorithmFPType, method, cpu>::compute(const Nume
         finishedFlag[0]          = int(totalFinishedFlag);
     }
 
+    printf("step10: compute end\n");
     return (!result) ? services::Status() : services::Status(services::ErrorMemoryCopyFailedInternal);
 }
 
@@ -1772,6 +1788,7 @@ template <typename algorithmFPType, Method method, CpuType cpu>
 Status DBSCANDistrStep12Kernel<algorithmFPType, method, cpu>::compute(NumericTable * ntInputClusterStructure, const DataCollection * dcPartialOrders,
                                                                       DataCollection * dcAssignmentQueries, const Parameter * par)
 {
+    printf("step12: compute start\n");
     const size_t blockIndex = par->blockIndex;
     const size_t nBlocks    = par->nBlocks;
 
@@ -1904,6 +1921,7 @@ Status DBSCANDistrStep12Kernel<algorithmFPType, method, cpu>::compute(NumericTab
         }
     }
 
+    printf("step12: compute end\n");
     return Status();
 }
 

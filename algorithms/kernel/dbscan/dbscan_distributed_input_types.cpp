@@ -993,28 +993,37 @@ void DistributedInput<step10Local>::set(Step10LocalNumericTableInputId id, const
  */
 services::Status DistributedInput<step10Local>::check(const daal::algorithms::Parameter * parameter, int method) const
 {
+    printf("step10: input check start\n");
     const Parameter * par = static_cast<const Parameter *>(parameter);
 
     DAAL_CHECK_STATUS_VAR(par->check());
     DAAL_CHECK_EX(par->nBlocks > 0, ErrorIncorrectParameter, ParameterName, nBlocksStr());
     DAAL_CHECK_EX(par->blockIndex < par->nBlocks, ErrorIncorrectParameter, ParameterName, blockIndexStr());
 
+    printf("step10: debug 1\n");
+    NumericTablePtr ntClusterStructure = get(step10InputClusterStructure);
+    printf("step10: debug 2\n");
+    if (ntClusterStructure->getNumberOfRows() != 0)
     {
-        NumericTablePtr ntClusterStructure = get(step10InputClusterStructure);
+        printf("step10: debug 3\n");
         DAAL_CHECK_EX(ntClusterStructure, ErrorNullNumericTable, ArgumentName, step10InputClusterStructureStr());
-
+        printf("step10: debug 4\n");
         int unexpectedLayouts = (int)packed_mask;
         DAAL_CHECK_STATUS_VAR(checkNumericTable(ntClusterStructure.get(), step10InputClusterStructureStr(), unexpectedLayouts, 0, 4, 0));
+        printf("step10: debug 5\n");
     }
-
+    printf("step10: debug 6\n");
     {
         NumericTablePtr ntClusterOffset = get(step10ClusterOffset);
+        printf("step10: debug 7\n");
         DAAL_CHECK_EX(ntClusterOffset, ErrorNullNumericTable, ArgumentName, step10ClusterOffsetStr());
 
         int unexpectedLayouts = (int)packed_mask;
+        printf("step10: debug 8\n");
         DAAL_CHECK_STATUS_VAR(checkNumericTable(ntClusterOffset.get(), step10ClusterOffsetStr(), unexpectedLayouts, 0, 1, 1));
     }
 
+    printf("step10: input check end\n");
     return services::Status();
 }
 
@@ -1188,26 +1197,30 @@ void DistributedInput<step12Local>::add(Step12LocalCollectionInputId id, const N
  */
 services::Status DistributedInput<step12Local>::check(const daal::algorithms::Parameter * parameter, int method) const
 {
+    printf("step12: input check start\n");
     const Parameter * par = static_cast<const Parameter *>(parameter);
 
     DAAL_CHECK_STATUS_VAR(par->check());
     DAAL_CHECK_EX(par->nBlocks > 0, ErrorIncorrectParameter, ParameterName, nBlocksStr());
     DAAL_CHECK_EX(par->blockIndex < par->nBlocks, ErrorIncorrectParameter, ParameterName, blockIndexStr());
 
+    NumericTablePtr ntClusterStructure = get(step12InputClusterStructure);
+    printf("step12: debug 1\n");
+    if (ntClusterStructure->getNumberOfRows() != 0)
     {
-        NumericTablePtr ntClusterStructure = get(step12InputClusterStructure);
         DAAL_CHECK_EX(ntClusterStructure, ErrorNullNumericTable, ArgumentName, step12InputClusterStructureStr());
 
         int unexpectedLayouts = (int)packed_mask;
         DAAL_CHECK_STATUS_VAR(checkNumericTable(ntClusterStructure.get(), step12InputClusterStructureStr(), unexpectedLayouts, 0, 4, 0));
     }
 
+    printf("step12: debug 2\n");
     DataCollectionPtr dcOrders = get(step12PartialOrders);
     DAAL_CHECK_EX(dcOrders, ErrorNullInputDataCollection, ArgumentName, step12PartialOrdersStr());
-
+    printf("step12: debug 3\n");
     const size_t nQueriesBlocks = dcOrders->size();
-    DAAL_CHECK_EX(nQueriesBlocks > 0, ErrorIncorrectNumberOfInputNumericTables, ArgumentName, step12PartialOrdersStr());
-
+    //DAAL_CHECK_EX(nQueriesBlocks > 0, ErrorIncorrectNumberOfInputNumericTables, ArgumentName, step12PartialOrdersStr());
+    printf("step12: debug 4\n");
     for (size_t i = 0; i < nQueriesBlocks; i++)
     {
         DAAL_CHECK_EX((*dcOrders)[i], ErrorNullNumericTable, ArgumentName, step12PartialOrdersStr());
@@ -1218,6 +1231,7 @@ services::Status DistributedInput<step12Local>::check(const daal::algorithms::Pa
         DAAL_CHECK_STATUS_VAR(checkNumericTable(ntOrders.get(), step12PartialOrdersStr(), unexpectedLayouts, 0, 2, 0));
     }
 
+    printf("step12: input check end\n");
     return services::Status();
 }
 

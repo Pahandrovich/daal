@@ -69,7 +69,7 @@ endif
 
 EXT_LIB := $(addprefix -L,$(TBB_PATH)) -ltbb -ltbbmalloc -ldl
 
-override proc = 4
+override proc = 2
 
 RES = $(addprefix $(RES_DIR)/, $(if $(filter run, $(mode)), $(addsuffix .res ,$(sample)), $(addsuffix .exe,$(sample))))
 

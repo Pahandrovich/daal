@@ -184,7 +184,14 @@ DAAL_EXPORT services::Status DistributedPartialResultStep6::allocate(const daal:
 
     services::Status status;
     printf("step6: debug 3\n");
-    set(step6ClusterStructure, HomogenNumericTable<int>::create(4, nRows, NumericTable::doAllocate, &status));
+    if (nRows != 0)
+    {
+        set(step6ClusterStructure, HomogenNumericTable<int>::create(4, nRows, NumericTable::doAllocate, &status));
+    }
+    else
+    {
+        set(step6ClusterStructure, HomogenNumericTable<int>::create(4, 0, NumericTable::notAllocate, &status));
+    }
     set(step6FinishedFlag, HomogenNumericTable<int>::create(1, 1, NumericTable::doAllocate, &status));
     set(step6NClusters, HomogenNumericTable<int>::create(1, 1, NumericTable::doAllocate, &status));
     printf("step6: debug 4\n");
@@ -305,6 +312,7 @@ template <typename algorithmFPType>
 DAAL_EXPORT services::Status DistributedPartialResultStep10::allocate(const daal::algorithms::Input * input,
                                                                       const daal::algorithms::Parameter * parameter, const int method)
 {
+    printf("step10: allocate start\n");
     const Parameter * par = static_cast<const Parameter *>(parameter);
     const size_t nBlocks  = par->nBlocks;
 
@@ -313,7 +321,14 @@ DAAL_EXPORT services::Status DistributedPartialResultStep10::allocate(const daal
 
     services::Status status;
 
-    set(step10ClusterStructure, HomogenNumericTable<int>::create(4, nRows, NumericTable::doAllocate, &status));
+    if (nRows != 0)
+    {
+        set(step10ClusterStructure, HomogenNumericTable<int>::create(4, nRows, NumericTable::doAllocate, &status));
+    }
+    else
+    {
+        set(step10ClusterStructure, HomogenNumericTable<int>::create(4, 0, NumericTable::notAllocate, &status));
+    }
     set(step10FinishedFlag, HomogenNumericTable<int>::create(1, 1, NumericTable::doAllocate, &status));
 
     DataCollectionPtr dcQueries(new DataCollection(nBlocks));
@@ -326,6 +341,7 @@ DAAL_EXPORT services::Status DistributedPartialResultStep10::allocate(const daal
 
     set(step10Queries, dcQueries);
 
+    printf("step10: allocate end\n");
     return status;
 }
 
@@ -373,6 +389,7 @@ template <typename algorithmFPType>
 DAAL_EXPORT services::Status DistributedPartialResultStep12::allocate(const daal::algorithms::Input * input,
                                                                       const daal::algorithms::Parameter * parameter, const int method)
 {
+    printf("step12: allocate start\n");
     const Parameter * par = static_cast<const Parameter *>(parameter);
     const size_t nBlocks  = par->nBlocks;
 
@@ -388,6 +405,7 @@ DAAL_EXPORT services::Status DistributedPartialResultStep12::allocate(const daal
 
     set(assignmentQueries, dcAssignmentQueries);
 
+    printf("step12: allocate end\n");
     return status;
 }
 

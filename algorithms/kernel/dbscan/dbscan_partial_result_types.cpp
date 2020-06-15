@@ -269,6 +269,7 @@ Status DistributedPartialResultStep6::check(const daal::algorithms::Input * inpu
         nRows += NumericTable::cast((*dcPartialData)[i])->getNumberOfRows();
     }
 
+    if (nRows != 0)
     {
         NumericTablePtr ntClusterStructure = get(step6ClusterStructure);
         DAAL_CHECK_EX(ntClusterStructure, ErrorNullNumericTable, ArgumentName, step6ClusterStructureStr());
@@ -490,6 +491,7 @@ void DistributedPartialResultStep10::set(DistributedPartialResultStep10Collectio
 
 Status DistributedPartialResultStep10::check(const daal::algorithms::Input * input, const daal::algorithms::Parameter * parameter, int method) const
 {
+    printf("step10: result check start\n");
     const Parameter * par = static_cast<const Parameter *>(parameter);
 
     const size_t nBlocks = par->nBlocks;
@@ -497,6 +499,7 @@ Status DistributedPartialResultStep10::check(const daal::algorithms::Input * inp
     const DistributedInput<step10Local> * algInput = static_cast<const DistributedInput<step10Local> *>(input);
     const size_t nRows                             = algInput->get(step10InputClusterStructure)->getNumberOfRows();
 
+    if (nRows != 0)
     {
         NumericTablePtr ntClusterStructure = get(step10ClusterStructure);
         DAAL_CHECK_EX(ntClusterStructure, ErrorNullNumericTable, ArgumentName, step10ClusterStructureStr());
@@ -528,6 +531,7 @@ Status DistributedPartialResultStep10::check(const daal::algorithms::Input * inp
         DAAL_CHECK_STATUS_VAR(checkNumericTable(ntQueries.get(), step10QueriesStr(), unexpectedLayouts, 0, 4, 0, false));
     }
 
+    printf("step10: result check end\n");
     return Status();
 }
 
@@ -611,6 +615,7 @@ void DistributedPartialResultStep12::set(DistributedPartialResultStep12Id id, co
 
 Status DistributedPartialResultStep12::check(const daal::algorithms::Input * input, const daal::algorithms::Parameter * parameter, int method) const
 {
+    printf("step12: result check start\n");
     const Parameter * par = static_cast<const Parameter *>(parameter);
 
     const size_t nBlocks = par->nBlocks;
@@ -630,6 +635,7 @@ Status DistributedPartialResultStep12::check(const daal::algorithms::Input * inp
         DAAL_CHECK_STATUS_VAR(checkNumericTable(ntAssignmentQueries.get(), assignmentQueriesStr(), unexpectedLayouts, 0, 2, 0, false));
     }
 
+    printf("step12: result check end\n");
     return Status();
 }
 
