@@ -126,12 +126,14 @@ void DistributedPartialResultStep3::set(DistributedPartialResultStep3Id id, cons
 
 Status DistributedPartialResultStep3::check(const daal::algorithms::Input * input, const daal::algorithms::Parameter * parameter, int method) const
 {
+    printf("step3: result check start\n");
     NumericTablePtr ntSplit = get(split);
     DAAL_CHECK_EX(ntSplit, ErrorNullNumericTable, ArgumentName, splitStr());
 
     const int unexpectedLayouts = (int)packed_mask;
     DAAL_CHECK_STATUS_VAR(checkNumericTable(ntSplit.get(), splitStr(), unexpectedLayouts, 0, 2, 1));
 
+    printf("step3: result check end\n");
     return Status();
 }
 
@@ -149,6 +151,7 @@ void DistributedPartialResultStep4::set(DistributedPartialResultStep4Id id, cons
 
 Status DistributedPartialResultStep4::check(const daal::algorithms::Input * input, const daal::algorithms::Parameter * parameter, int method) const
 {
+    printf("step4: result check start\n");
     const Parameter * par = static_cast<const Parameter *>(parameter);
 
     const size_t nBlocks = par->leftBlocks + par->rightBlocks;
@@ -160,26 +163,30 @@ Status DistributedPartialResultStep4::check(const daal::algorithms::Input * inpu
     DataCollectionPtr dcPartitionedPartialOrders = get(partitionedPartialOrders);
 
     DAAL_CHECK_EX(dcPartitionedData.get(), ErrorNullPartialResult, ArgumentName, partitionedDataStr());
-    DAAL_CHECK_EX(dcPartitionedData->size() == nBlocks, ErrorIncorrectDataCollectionSize, ArgumentName, partitionedDataStr());
+    if (NumericTable::cast((*dcPartitionedData)[0])->getNumberOfRows() != 0)
+        DAAL_CHECK_EX(dcPartitionedData->size() == nBlocks, ErrorIncorrectDataCollectionSize, ArgumentName, partitionedDataStr());
 
     DAAL_CHECK_EX(dcPartitionedPartialOrders.get(), ErrorNullPartialResult, ArgumentName, partitionedPartialOrdersStr());
-    DAAL_CHECK_EX(dcPartitionedPartialOrders->size() == nBlocks, ErrorIncorrectDataCollectionSize, ArgumentName, partitionedPartialOrdersStr());
+    if (NumericTable::cast((*dcPartitionedData)[0])->getNumberOfRows() != 0)
+        DAAL_CHECK_EX(dcPartitionedPartialOrders->size() == nBlocks, ErrorIncorrectDataCollectionSize, ArgumentName, partitionedPartialOrdersStr());
 
     const int unexpectedLayouts = (int)packed_mask;
 
-    for (size_t i = 0; i < nBlocks; i++)
-    {
-        DAAL_CHECK_EX((*dcPartitionedData)[i], ErrorNullNumericTable, ArgumentName, partitionedDataStr());
-        NumericTablePtr ntPartitionedData = NumericTable::cast((*dcPartitionedData)[i]);
-        DAAL_CHECK_EX(ntPartitionedData, ErrorIncorrectElementInNumericTableCollection, ArgumentName, partitionedDataStr());
-        DAAL_CHECK_STATUS_VAR(checkNumericTable(ntPartitionedData.get(), partitionedDataStr(), unexpectedLayouts, 0, nFeatures, 0, false));
+    if (NumericTable::cast((*dcPartitionedData)[0])->getNumberOfRows() != 0)
+        for (size_t i = 0; i < nBlocks; i++)
+        {
+            DAAL_CHECK_EX((*dcPartitionedData)[i], ErrorNullNumericTable, ArgumentName, partitionedDataStr());
+            NumericTablePtr ntPartitionedData = NumericTable::cast((*dcPartitionedData)[i]);
+            DAAL_CHECK_EX(ntPartitionedData, ErrorIncorrectElementInNumericTableCollection, ArgumentName, partitionedDataStr());
+            DAAL_CHECK_STATUS_VAR(checkNumericTable(ntPartitionedData.get(), partitionedDataStr(), unexpectedLayouts, 0, nFeatures, 0, false));
 
-        DAAL_CHECK_EX((*dcPartitionedPartialOrders)[i], ErrorNullNumericTable, ArgumentName, partitionedPartialOrdersStr());
-        NumericTablePtr ntPartitionedPartialOrders = NumericTable::cast((*dcPartitionedPartialOrders)[i]);
-        DAAL_CHECK_EX(ntPartitionedPartialOrders, ErrorIncorrectElementInNumericTableCollection, ArgumentName, partitionedPartialOrdersStr());
-        DAAL_CHECK_STATUS_VAR(checkNumericTable(ntPartitionedPartialOrders.get(), partitionedPartialOrdersStr(), unexpectedLayouts, 0, 2, 0, false));
-    }
+            DAAL_CHECK_EX((*dcPartitionedPartialOrders)[i], ErrorNullNumericTable, ArgumentName, partitionedPartialOrdersStr());
+            NumericTablePtr ntPartitionedPartialOrders = NumericTable::cast((*dcPartitionedPartialOrders)[i]);
+            DAAL_CHECK_EX(ntPartitionedPartialOrders, ErrorIncorrectElementInNumericTableCollection, ArgumentName, partitionedPartialOrdersStr());
+            DAAL_CHECK_STATUS_VAR(checkNumericTable(ntPartitionedPartialOrders.get(), partitionedPartialOrdersStr(), unexpectedLayouts, 0, 2, 0, false));
+        }
 
+    printf("step4: result check end\n");
     return Status();
 }
 

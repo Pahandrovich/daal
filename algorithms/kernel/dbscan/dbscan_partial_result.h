@@ -83,8 +83,10 @@ template <typename algorithmFPType>
 DAAL_EXPORT services::Status DistributedPartialResultStep3::allocate(const daal::algorithms::Input * input,
                                                                      const daal::algorithms::Parameter * parameter, const int method)
 {
+    printf("step3: allocate start\n");
     services::Status status;
     set(split, HomogenNumericTable<algorithmFPType>::create(2, 1, NumericTable::doAllocate, &status));
+    printf("step3: allocate end\n");
     return status;
 }
 
@@ -98,6 +100,7 @@ template <typename algorithmFPType>
 DAAL_EXPORT services::Status DistributedPartialResultStep4::allocate(const daal::algorithms::Input * input,
                                                                      const daal::algorithms::Parameter * parameter, const int method)
 {
+    printf("step4: allocate start\n");
     const Parameter * par = static_cast<const Parameter *>(parameter);
     const size_t nBlocks  = par->leftBlocks + par->rightBlocks;
 
@@ -119,6 +122,8 @@ DAAL_EXPORT services::Status DistributedPartialResultStep4::allocate(const daal:
 
     set(partitionedData, dcPartitionedData);
     set(partitionedPartialOrders, dcPartitionedPartialOrders);
+    
+    printf("step4: allocate end\n");
     return status;
 }
 

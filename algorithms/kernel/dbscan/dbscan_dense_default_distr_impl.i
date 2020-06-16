@@ -133,6 +133,7 @@ Status DBSCANDistrStep3Kernel<algorithmFPType, method, cpu>::compute(const DataC
                                                                      const DataCollection * dcPartialBoundingBoxes, NumericTable * ntSplit,
                                                                      const Parameter * par)
 {
+    printf("step3: start implementation\n");
     const size_t leftBlocks  = par->leftBlocks;
     const size_t rightBlocks = par->rightBlocks;
 
@@ -190,7 +191,18 @@ Status DBSCANDistrStep3Kernel<algorithmFPType, method, cpu>::compute(const DataC
 
     DAAL_OVERFLOW_CHECK_BY_MULTIPLICATION(size_t, totalNRows, sizeof(algorithmFPType));
 
-    TArray<algorithmFPType, cpu> splitColumnArray(totalNRows);
+    if (totalNRows == 0)
+    {
+        WriteRows<algorithmFPType, cpu> splitRows(ntSplit, 0, 1);
+        DAAL_CHECK_BLOCK_STATUS(splitRows);
+        algorithmFPType * const split = splitRows.get();
+        split[0]                      = 0;
+        split[1]                      = (algorithmFPType)(-1);
+        printf("step3: end implementation 0\n");
+        return Status();
+    }
+
+    TArray<algorithmFPType, cpu> splitColumnArray(totalNRows); // error?
     DAAL_CHECK_MALLOC(splitColumnArray.get());
     algorithmFPType * const splitColumn = splitColumnArray.get();
 
@@ -220,6 +232,7 @@ Status DBSCANDistrStep3Kernel<algorithmFPType, method, cpu>::compute(const DataC
     split[0]                      = splitValue;
     split[1]                      = (algorithmFPType)splitDim;
 
+    printf("step3: end implementation\n");
     return Status();
 }
 
@@ -228,6 +241,7 @@ Status DBSCANDistrStep4Kernel<algorithmFPType, method, cpu>::compute(const DataC
                                                                      const DataCollection * dcPartialOrders, DataCollection * dcPartitionedData,
                                                                      DataCollection * dcPartitionedPartialOrders, const Parameter * par)
 {
+    printf("step4: start implementation\n");
     const size_t leftBlocks  = par->leftBlocks;
     const size_t rightBlocks = par->rightBlocks;
 
@@ -243,6 +257,7 @@ Status DBSCANDistrStep4Kernel<algorithmFPType, method, cpu>::compute(const DataC
     int result = 0;
 
     size_t splitDim = -1;
+    size_t valuedPart = 0;
     for (size_t part = 0; part < nBlocks; part++)
     {
         NumericTablePtr ntPartialSplit = NumericTable::cast((*dcPartialSplits)[part]);
@@ -250,7 +265,13 @@ Status DBSCANDistrStep4Kernel<algorithmFPType, method, cpu>::compute(const DataC
         DAAL_CHECK_BLOCK_STATUS(partialSplitRows);
         const algorithmFPType * const partialSplit = partialSplitRows.get();
 
-        partialSplitValues[part] = partialSplit[0];
+        if ((size_t)partialSplit[1] == -1)
+        {
+            continue;
+        }
+
+        partialSplitValues[valuedPart] = partialSplit[0];
+        valuedPart++;
 
         DAAL_ASSERT(partialSplit[1] >= 0)
         if (part == 0)
@@ -263,7 +284,7 @@ Status DBSCANDistrStep4Kernel<algorithmFPType, method, cpu>::compute(const DataC
         }
     }
 
-    algorithmFPType splitValue = findKthStatistic<algorithmFPType, cpu>(partialSplitValues, nBlocks, nBlocks / 2);
+    algorithmFPType splitValue = findKthStatistic<algorithmFPType, cpu>(partialSplitValues, valuedPart, valuedPart / 2);
 
     DAAL_OVERFLOW_CHECK_BY_MULTIPLICATION(size_t, nBlocks, sizeof(int));
 
@@ -289,9 +310,13 @@ Status DBSCANDistrStep4Kernel<algorithmFPType, method, cpu>::compute(const DataC
         NumericTablePtr ntData = NumericTable::cast((*dcPartialData)[part]);
         const size_t nRows     = ntData->getNumberOfRows();
 
+        if (nRows == 0) printf("step4: debug 1\n");
         ReadColumns<algorithmFPType, cpu> dataColumns(ntData.get(), splitDim, 0, nRows);
-        DAAL_CHECK_BLOCK_STATUS(dataColumns);
+        if (nRows == 0) printf("step4: debug 2\n");
+        DAAL_CHECK_BLOCK_STATUS(dataColumns);   // error?
+        if (nRows == 0) printf("step4: debug 3\n");
         const algorithmFPType * const data = dataColumns.get();
+        if (nRows == 0) printf("step4: debug 4\n");
 
         for (size_t i = 0; i < nRows; i++)
         {
@@ -388,6 +413,7 @@ Status DBSCANDistrStep4Kernel<algorithmFPType, method, cpu>::compute(const DataC
             }
         }
     }
+    printf("step4: end implementation\n");
     return (!result) ? services::Status() : services::Status(services::ErrorMemoryCopyFailedInternal);
 }
 
