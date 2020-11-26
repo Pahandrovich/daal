@@ -56,7 +56,7 @@ set LIB_DAAL=onedal_core.lib onedal_thread.lib
 set LIB_DAAL_DLL=onedal_core_dll.lib
 set LFLAGS_DAAL=%LIB_DAAL% tbb12.lib tbbmalloc.lib impi.lib
 set LFLAGS_DAAL_DLL=onedal_core_dll.lib
-set ODBC_LIB=%ODBC_PATH%/Odbc32.lib
+set ODBC_LIB=%ODBC_PATH%\Odbc32.lib
 echo %ODBC_LIB%
 set MYSQL_LOGFILE=.\%RESULT_DIR%\build_mysql.log
 if not "%RMODE%"=="run" (
